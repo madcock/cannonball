@@ -269,5 +269,6 @@ pip-log.txt
 ## libretro
 #############
 
+*.a
 *.so
 *.dll
