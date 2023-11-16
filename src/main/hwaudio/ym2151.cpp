@@ -1282,7 +1282,11 @@ void YM2151::init(int rate, int fps)
     this->sampfreq = rate;
     init_tables();
 
+#if !defined(SF2000)
     this->sampfreq = rate ? rate : 44100;    /* avoid division by 0 in init_chip_tables() */
+#else
+    this->sampfreq = rate ? rate : 22050;    /* avoid division by 0 in init_chip_tables() */
+#endif
 
     init_chip_tables();
 

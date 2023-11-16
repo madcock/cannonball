@@ -36,7 +36,11 @@ void OSoundInt::init()
         ym = new YM2151(0.5f, SOUND_CLOCK);
 
     pcm->init(config.fps);
+#if !defined(SF2000)
     ym->init(44100, config.fps);
+#else
+	ym->init(22050, config.fps);
+#endif
 
     reset();
 

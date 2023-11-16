@@ -67,6 +67,12 @@ void Config::load_scores(const std::string &filename)
 
     try
     {
+#if defined(SF2000)
+        std::string hiscore_filename = engine.jap ? filename + "_jap.xml" : filename + ".xml";
+        FILE *hiscorefile = fopen(hiscore_filename.c_str(), "w");
+        if (hiscorefile)
+            fclose(hiscorefile);
+#endif
         read_xml(engine.jap ? filename + "_jap.xml" : filename + ".xml" , pt, boost::property_tree::xml_parser::trim_whitespace);
     }
     catch (std::exception &e)

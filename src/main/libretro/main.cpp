@@ -792,7 +792,11 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
    /* Due to integer rounding errors (44100/102 = 367.5),
     * we produce fewer than the expected 44100 samples
     * per second when running at 120 fps... */
+#if !defined(SF2000)
    info->timing.sample_rate    = (config.fps == 120) ? 44040 : 44100;
+#else
+   info->timing.sample_rate    = (config.fps == 120) ? 22020 : 22050;
+#endif
 
    info->geometry.max_width    = S16_WIDTH_WIDE << 1;
    info->geometry.max_height   = S16_HEIGHT     << 1;

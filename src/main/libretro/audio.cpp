@@ -118,7 +118,11 @@ void Audio::resume_audio()
 // Called every frame to update the audio
 void Audio::tick()
 {
-   static unsigned SND_RATE      = 44100;
+#if !defined(SF2000)
+    static unsigned SND_RATE      = 44100;
+#else
+    static unsigned SND_RATE      = 22050;
+#endif
     int bytes_written = 0;
     int newpos;
 
