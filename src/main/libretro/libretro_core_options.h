@@ -155,7 +155,7 @@ struct retro_core_option_v2_definition option_defs_us[] = {
          { "OFF", NULL },
          { NULL, NULL },
       },
-#ifdef DINGUX
+#if defined(DINGUX) || defined(SF2000)
       "OFF"
 #else
       "ON"

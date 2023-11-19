@@ -8,6 +8,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(SF2000)
+#include <sys/stat.h>	// mkdir
+#endif
 
 #include <file/file_path.h>
 #include <streams/file_stream.h>
@@ -81,7 +84,7 @@ static void config_init(void)
     config.video.fps        = 2; // Default is 60 fps
 #endif
     config.video.fps_count  = 0; // FPS Counter
-#ifdef DINGUX
+#if defined(DINGUX) || defined(SF2000)
     config.video.widescreen = 0; // Enable Widescreen Mode
 #else
     config.video.widescreen = 1; // Enable Widescreen Mode
@@ -795,7 +798,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
 #if !defined(SF2000)
    info->timing.sample_rate    = (config.fps == 120) ? 44040 : 44100;
 #else
-   info->timing.sample_rate    = (config.fps == 120) ? 22020 : 22050;
+   info->timing.sample_rate    = (config.fps == 120) ? 44040 : 22050;
 #endif
 
    info->geometry.max_width    = S16_WIDTH_WIDE << 1;
@@ -902,6 +905,7 @@ static void retro_build_save_paths(void)
    /* Build high score save paths
     * > Note: These are not 'full' paths;
     *   suffix + extension are added elsewhere */
+#if !defined(SF2000)
    fill_pathname_join(FILENAME_SCORES, save_dir,
          "hiscores", sizeof(FILENAME_SCORES));
 
@@ -910,6 +914,21 @@ static void retro_build_save_paths(void)
 
    fill_pathname_join(FILENAME_CONT, save_dir,
          "hiscores_continuous", sizeof(FILENAME_CONT));
+#else
+   fill_pathname_join(FILENAME_SCORES, save_dir,
+         "outrun/hiscores", sizeof(FILENAME_SCORES));
+ 
+   fill_pathname_join(FILENAME_TTRIAL, save_dir,
+         "outrun/hiscores_timetrial", sizeof(FILENAME_TTRIAL));
+ 
+   fill_pathname_join(FILENAME_CONT, save_dir,
+         "outrun/hiscores_continuous", sizeof(FILENAME_CONT));
+
+   // ensure outrun save sub folder is created
+   char save_base_dir[512];
+   fill_pathname_join(save_base_dir, save_dir, "outrun", sizeof(save_base_dir));
+   mkdir(save_base_dir, 0777);
+#endif
 }
 
 bool retro_load_game(const struct retro_game_info *info)
@@ -1150,10 +1169,17 @@ static void process_events(void)
 
    for (i = 0; i < (sizeof(binds) / sizeof(binds[0])); i++)
    {
+#if !defined(SF2000)
       if (ret & (1 << binds[i].joy_id))
          input.handle_key(binds[i].id, true);
       else
          input.handle_key(binds[i].id, false);
+#else
+      if (ret & (1 << i))
+         input.handle_key(binds[i].id, true);
+      else
+         input.handle_key(binds[i].id, false);
+#endif
    }
 
    analog_left_x = input_state_cb(0, RETRO_DEVICE_ANALOG,
